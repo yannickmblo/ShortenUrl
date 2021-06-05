@@ -9,5 +9,7 @@ class Url extends Model
 {
     use HasFactory;
 
-    $protected fillable = ['longurl', 'shorturl'];
+    public $timestamps = false;
+
+    protected $fillable = ['longurl', 'shorturl'];
 }

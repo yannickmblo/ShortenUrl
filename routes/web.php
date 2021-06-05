@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\Url;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -17,12 +19,47 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('', function () {
-    dd(request('url'));
+function nombrealeatoire(){
+    $shorturl = strtolower(Str::random(5));
+
+    if (Url::whereShorturl($shorturl)->count() > 0) {
+      return nombrealeatoire();
+    }
+
+    return $shorturl;
+}
+
+Route::post('/', function () {
+     //dd(request('url'));
+     // vérifier si l'url a déja été Racourcir
+    $url =  Url::where('longurl',request('url') )->first();
+
+    if ($url) {
+        return view('result')->with('shorturl', $url->shorturl) ;
+    }
+    else {
+      $row = Url::create(
+          [
+            'longurl' => request('url'),
+            'shorturl'=> nombrealeatoire(),
+
+          ]);
+    }
+
+    if ($row) {
+        return view('result')->with('shorturl', $row->shorturl) ;
+    }
 });
 
 
-// cree le formulaire
-// enregistrer les information en base.
-    // si il existe deja on affiche l'ancien
-    // si il n'existe pas encore on enregistre den base et on affiche le resultat.
+
+Route::get('/{shorturl}', function ($shorturl) {
+    $url =  Url::where('shorturl', $shorturl )->first();
+
+    if (! $url) {
+        return redirect('/');
+    }
+    else {
+      return redirect($url->longurl);
+    }
+});

@@ -17,7 +17,6 @@ class CreateUrlsTable extends Migration
             $table->id();
             $table->string('longurl')->unique();
             $table->string('shorturl', 5)->unique();
-
         });
     }
 
